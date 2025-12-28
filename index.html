@@ -362,6 +362,41 @@
                 <p>🎮 Account Created: <strong id="playerDateDisplay">-</strong></p>
                 <p>💰 Wallet Balance: <strong id="walletBalanceDisplay">₹0</strong></p>
             </div>
+
+            <!-- Add Game Result Section -->
+            <div class="user-info" style="margin-top:20px;">
+                <p>🕹️ Add Game Result</p>
+
+                <div class="form-group">
+                    <label for="gameMode">Game Mode</label>
+                    <select id="gameMode" style="width:100%;padding:10px;border-radius:8px;border:2px solid rgba(255,107,0,0.4);background:rgba(0,0,0,0.6);color:#fff;">
+                        <option value="Solo">Solo</option>
+                        <option value="Duo">Duo</option>
+                        <option value="Squad">Squad</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="kills">Kills</label>
+                    <input type="number" id="kills" placeholder="Total kills" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="placement">Placement</label>
+                    <input type="number" id="placement" placeholder="Rank (1,2,3...)" min="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="isWin">Result</label>
+                    <select id="isWin" style="width:100%;padding:10px;border-radius:8px;border:2px solid rgba(255,107,0,0.4);background:rgba(0,0,0,0.6);color:#fff;">
+                        <option value="true">Win</option>
+                        <option value="false">Loss</option>
+                    </select>
+                </div>
+
+                <button class="btn-register" id="saveMatchBtn" type="button">Save Match</button>
+            </div>
+
             <button class="btn-logout" onclick="logout()">Logout</button>
         </div>
 
@@ -371,10 +406,10 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <!-- Firebase SDK v11 - Latest -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
 
     <script>
         // ✅ FIREBASE CONFIG - सभी values add हैं!
@@ -508,7 +543,7 @@
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
 
-            document.getElementById('loginLoader').style.display = 'block';
+            document.getElementById('loginLoader').display = 'block';
             document.getElementById('loginBtn').disabled = true;
 
             try {
@@ -536,39 +571,4 @@
                 const userData = userDoc.data();
 
                 document.getElementById('playerNameDisplay').textContent = userData.name || user.displayName;
-                document.getElementById('playerEmailDisplay').textContent = user.email;
-                document.getElementById('playerPhoneDisplay').textContent = userData.phoneNumber;
-                document.getElementById('playerDateDisplay').textContent = userData.createdAt.toDate().toLocaleDateString('en-IN');
-                document.getElementById('walletBalanceDisplay').textContent = '₹' + userData.wallet.balance;
-
-                document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-                document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-                document.getElementById('dashboard').classList.add('active');
-            } catch (error) {
-                console.error('Error loading user data:', error);
-            }
-        }
-
-        // Logout
-        function logout() {
-            auth.signOut().then(() => {
-                showMessage('✅ Logged out successfully!', 'success');
-                document.getElementById('signupForm').reset();
-                document.getElementById('loginForm').reset();
-                document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
-                document.getElementById('signup').classList.add('active');
-                document.querySelectorAll('.tab-btn')[0].classList.add('active');
-            });
-        }
-
-        // Check if User is Already Logged In
-        if (firebaseInitialized) {
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    displayUserDashboard(user);
-                }
-            });
-        }
-    </script>
-</body>
-</html>
+                document.getElementById('playerEmailDisplay').textContent
