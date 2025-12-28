@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire - Admin Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #FF6B00 100%);
+            min-height: 100vh;
+            color: #ddd;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 25, 0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 107, 0, 0.3);
+        }
+
+        .navbar h1 {
+            color: #FF6B00;
+            font-size: 24px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            padding: 8px 15px;
+            background: rgba(255, 107, 0, 0.2);
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            color: #FF6B00;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: rgba(255, 107, 0, 0.4);
+            border-color: #FF6B00;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(10, 10, 25, 0.9);
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #FF6B00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #FF9500;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #FF6B00, #FF9500);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(200, 0, 0, 0.3);
+            color: #ff6b6b;
+            border: 1px solid rgba(200, 0, 0, 0.6);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(200, 0, 0, 0.5);
+        }
+
+        .btn-success {
+            background: rgba(0, 200, 0, 0.3);
+            color: #00ff00;
+            border: 1px solid rgba(0, 200, 0, 0.6);
+        }
+
+        .btn-success:hover {
+            background: rgba(0, 200, 0, 0.5);
+        }
+
+        .tournament-card {
+            background: rgba(10, 10, 25, 0.9);
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .tournament-card h3 {
+            color: #FF6B00;
+            margin-bottom: 10px;
+        }
+
+        .tournament-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .tournament-info div {
+            background: rgba(255, 107, 0, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #FF6B00;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 200, 0, 0.2);
+            border: 1px solid rgba(0, 200, 0, 0.5);
+            color: #00ff00;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(200, 0, 0, 0.2);
+            border: 1px solid rgba(200, 0, 0, 0.5);
+            color: #ff6b6b;
+            display: block;
+        }
+
+        .uid-card {
+            background: rgba(10, 10, 25, 0.9);
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .uid-card h3 {
+            color: #FF6B00;
+            margin-bottom: 10px;
+        }
+
+        .uid-image {
+            max-width: 200px;
+            max-height: 200px;
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>⚙️ Admin Panel</h1>
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('tournaments')">Tournaments</button>
+            <button class="nav-btn" onclick="showSection('uidVerification')">Verify UID</button>
+            <button class="nav-btn" onclick="showSection('verification')">Verify Matches</button>
+            <button class="nav-btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="messageBox" class="message"></div>
+
+        <!-- Tournaments Section -->
+        <div id="tournaments" class="section active">
+            <div class="card">
+                <h2>🏆 Create New Tournament</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tournament Name</label>
+                        <input type="text" id="tournamentName" placeholder="Tournament Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Prize Pool (₹)</label>
+                        <input type="number" id="prizePool" placeholder="Prize Pool Amount" min="1000">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Entry Fee (₹)</label>
+                        <input type="number" id="entryFee" placeholder="Entry Fee" min="100">
+                    </div>
+                    <div class="form-group">
+                        <label>Team Size</label>
+                        <select id="teamSize">
+                            <option value="Solo">Solo (1 Player)</option>
+                            <option value="Duo">Duo (2 Players)</option>
+                            <option value="Squad">Squad (4 Players)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Tournament Date & Time</label>
+                    <input type="datetime-local" id="tournamentDate">
+                </div>
+
+                <button class="btn" onclick="createTournament()">Create Tournament</button>
+            </div>
+
+            <div class="card">
+                <h2>📋 Active Tournaments</h2>
+                <div id="tournamentsContainer">
+                    <p style="color: #666;">Loading tournaments...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UID Verification Section -->
+        <div id="uidVerification" class="section">
+            <div class="card">
+                <h2>🪪 Pending UID Verifications</h2>
+                <div id="uidVerificationContainer">
+                    <p style="color: #666;">Loading pending UIDs...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verification Section -->
+        <div id="verification" class="section">
+            <div class="card">
+                <h2>✅ Verify Match Results</h2>
+                <div id="verificationContainer">
+                    <p style="color: #666;">Loading pending matches...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0EOrBi_i8mBO-cmq38lL10IgTzluh5UI",
+            authDomain: "fun-with-free-fire.firebaseapp.com",
+            projectId: "fun-with-free-fire",
+            storageBucket: "fun-with-free-fire.firebasestorage.app",
+            messagingSenderId: "664963840338",
+            appId: "1:664963840338:web:7094a4747b82c31174228b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Check if admin
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                const doc = await db.collection('admins').doc(user.uid).get();
+                if (!doc.exists) {
+                    alert('❌ Access Denied! Admin only.');
+                    window.location.href = 'index.html';
+                } else {
+                    loadTournaments();
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (section === 'uidVerification') loadPendingUIDs();
+            if (section === 'verification') loadPendingMatches();
+        }
+
+        function showMsg(msg, type) {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.textContent = msg;
+            msgBox.className = 'message ' + type;
+            setTimeout(() => { msgBox.className = 'message'; }, 4000);
+        }
+
+        // ===== TOURNAMENT FUNCTIONS =====
+        async function createTournament() {
+            const name = document.getElementById('tournamentName').value;
+            const prizePool = parseInt(document.getElementById('prizePool').value || 0);
+            const entryFee = parseInt(document.getElementById('entryFee').value || 0);
+            const teamSize = document.getElementById('teamSize').value;
+            const date = document.getElementById('tournamentDate').value;
+
+            if (!name || !prizePool || !entryFee || !date) {
+                showMsg('❌ Fill all fields!', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('tournaments').add({
+                    name: name,
+                    prizePool: prizePool,
+                    entryFee: entryFee,
+                    teamSize: teamSize,
+                    scheduledDate: new Date(date),
+                    status: 'active',
+                    participants: 0,
+                    createdBy: currentUser.uid,
+                    createdAt: new Date()
+                });
+
+                showMsg('✅ Tournament created!', 'success');
+                document.getElementById('tournamentName').value = '';
+                document.getElementById('prizePool').value = '';
+                document.getElementById('entryFee').value = '';
+                document.getElementById('tournamentDate').value = '';
+                await loadTournaments();
+            } catch (error) {
+                showMsg('❌ Error creating tournament', 'error');
+            }
+        }
+
+        async function loadTournaments() {
+            try {
+                const snap = await db.collection('tournaments').where('status', '==', 'active').get();
+                let html = '';
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    html += `<div class="tournament-card">
+                        <h3>${data.name}</h3>
+                        <div class="tournament-info">
+                            <div>💰 Prize: ₹${data.prizePool}</div>
+                            <div>💵 Entry: ₹${data.entryFee}</div>
+                            <div>👥 Team: ${data.teamSize}</div>
+                            <div>👤 Participants: ${data.participants || 0}</div>
+                        </div>
+                        <button class="btn" onclick="viewParticipants('${doc.id}')">View Participants</button>
+                        <button class="btn btn-secondary" onclick="endTournament('${doc.id}')">End Tournament</button>
+                    </div>`;
+                });
+                document.getElementById('tournamentsContainer').innerHTML = html || '<p style="color: #666;">No active tournaments</p>';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function viewParticipants(tournamentId) {
+            alert('Participants list coming soon!');
+        }
+
+        async function endTournament(tournamentId) {
+            if (!confirm('Are you sure?')) return;
+            try {
+                await db.collection('tournaments').doc(tournamentId).update({
+                    status: 'completed'
+                });
+                showMsg('✅ Tournament ended!', 'success');
+                await loadTournaments();
+            } catch (error) {
+                showMsg('❌ Error ending tournament', 'error');
+            }
+        }
+
+        // ===== UID VERIFICATION FUNCTIONS =====
+        async function loadPendingUIDs() {
+            try {
+                const snap = await db.collection('users').where('uidStatus', '==', 'pending').get();
+                let html = '';
+                if (snap.empty) {
+                    html = '<p style="color: #666;">No pending UID verifications</p>';
+                } else {
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        html += `<div class="uid-card">
+                            <h3>👤 ${data.name}</h3>
+                            <div style="margin-bottom: 10px;">
+                                <strong style="color: #FF9500;">Email:</strong> ${data.email}<br>
+                                <strong style="color: #FF9500;">Phone:</strong> ${data.phone}
+                            </div>
+                            ${data.uidImageUrl ? `<img src="${data.uidImageUrl}" alt="UID Screenshot" class="uid-image">` : ''}
+                            <div style="margin-top: 10px; color: #999; font-size: 12px;">
+                                Uploaded: ${new Date(data.uidUploadedAt?.toDate()).toLocaleString()}
+                            </div>
+                            <button class="btn btn-success" onclick="approveUID('${doc.id}', '${data.name}')">✅ Approve</button>
+                            <button class="btn btn-secondary" onclick="rejectUID('${doc.id}', '${data.name}')">❌ Reject</button>
+                        </div>`;
+                    });
+                }
+                document.getElementById('uidVerificationContainer').innerHTML = html;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function approveUID(userId, playerName) {
+            try {
+                await db.collection('users').doc(userId).update({
+                    uidStatus: 'approved',
+                    uidApprovedAt: new Date()
+                });
+                showMsg(`✅ ${playerName}'s UID approved!`, 'success');
+                await loadPendingUIDs();
+            } catch (error) {
+                showMsg('❌ Error approving UID', 'error');
+            }
+        }
+
+        async function rejectUID(userId, playerName) {
+            if (!confirm('Are you sure? Player will need to upload again.')) return;
+            try {
+                await db.collection('users').doc(userId).update({
+                    uidStatus: 'not-uploaded',
+                    uidImageUrl: null,
+                    uidUploadedAt: null
+                });
+                showMsg(`❌ ${playerName}'s UID rejected!`, 'success');
+                await loadPendingUIDs();
+            } catch (error) {
+                showMsg('❌ Error rejecting UID', 'error');
+            }
+        }
+
+        // ===== MATCH VERIFICATION FUNCTIONS =====
+        async function loadPendingMatches() {
+            try {
+                const snap = await db.collectionGroup('tournamentMatches').where('status', '==', 'pending').get();
+                let html = '';
+                if (snap.empty) {
+                    html = '<p style="color: #666;">No pending matches</p>';
+                } else {
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        html += `<div class="tournament-card">
+                            <h3>Tournament Match</h3>
+                            <div class="tournament-info" style="grid-template-columns: 1fr 1fr;">
+                                <div>Player: ${data.playerName}</div>
+                                <div>Status: Pending</div>
+                            </div>
+                            <button class="btn" onclick="verifyMatch('${doc.ref.parent.parent.id}', '${doc.id}')">Verify & Approve</button>
+                        </div>`;
+                    });
+                }
+                document.getElementById('verificationContainer').innerHTML = html;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function verifyMatch(tournamentId, matchId) {
+            alert('Match verification coming soon!');
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
+</body>
+</html>
