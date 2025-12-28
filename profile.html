@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Fire - Player Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a0033 0%, #330066 50%, #FF6B00 100%);
+            min-height: 100vh;
+            color: #ddd;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 25, 0.95);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 107, 0, 0.3);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .navbar h1 {
+            color: #FF6B00;
+            font-size: 24px;
+            text-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 8px 15px;
+            background: rgba(255, 107, 0, 0.2);
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            color: #FF6B00;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active, .nav-btn:hover {
+            background: rgba(255, 107, 0, 0.4);
+            border-color: #FF6B00;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(10, 10, 25, 0.9);
+            border: 2px solid rgba(255, 107, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 107, 0, 0.1);
+        }
+
+        .card h2 {
+            color: #FF6B00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #FF9500;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+        }
+
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #FF6B00;
+            box-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+        }
+
+        .form-group input:disabled {
+            background: rgba(0, 0, 0, 0.4);
+            color: #999;
+            cursor: not-allowed;
+            border-color: rgba(255, 107, 0, 0.2);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #FF6B00, #FF9500);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(200, 0, 0, 0.3);
+            color: #ff6b6b;
+            border: 1px solid rgba(200, 0, 0, 0.6);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(200, 0, 0, 0.5);
+        }
+
+        .stat-item {
+            background: rgba(255, 107, 0, 0.1);
+            border: 1px solid rgba(255, 107, 0, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-item strong {
+            color: #FF6B00;
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(0, 200, 0, 0.2);
+            border: 1px solid rgba(0, 200, 0, 0.5);
+            color: #00ff00;
+            display: block;
+        }
+
+        .message.error {
+            background: rgba(200, 0, 0, 0.2);
+            border: 1px solid rgba(200, 0, 0, 0.5);
+            color: #ff6b6b;
+            display: block;
+        }
+
+        .uid-status {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+
+        .uid-status.pending {
+            background: rgba(255, 165, 0, 0.2);
+            border: 1px solid rgba(255, 165, 0, 0.5);
+            color: #FFD700;
+        }
+
+        .uid-status.approved {
+            background: rgba(0, 200, 0, 0.2);
+            border: 1px solid rgba(0, 200, 0, 0.5);
+            color: #00ff00;
+        }
+
+        .uid-status.not-uploaded {
+            background: rgba(200, 0, 0, 0.2);
+            border: 1px solid rgba(200, 0, 0, 0.5);
+            color: #ff6b6b;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-label {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #FF6B00, #FF9500);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .file-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 107, 0, 0.5);
+        }
+
+        .file-info {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 107, 0, 0.1);
+            border-left: 3px solid #FF6B00;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar">
+        <h1>🎮 Free Fire Tournament</h1>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="showSection('dashboard')">Dashboard</button>
+            <button class="nav-btn active" onclick="showSection('profile')">Profile</button>
+            <button class="nav-btn" onclick="showSection('wallet')">Wallet</button>
+            <button class="nav-btn" onclick="showSection('tournaments')">Tournaments</button>
+            <button class="nav-btn" onclick="showSection('leaderboard')">Leaderboard</button>
+            <button class="nav-btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="messageBox" class="message"></div>
+
+        <!-- Profile Section -->
+        <div id="profile" class="section active">
+            <div class="card">
+                <h2>👤 Player Profile</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🎮 Gaming Username (Editable)</label>
+                        <input type="text" id="profileName" placeholder="Your gaming name">
+                        <small style="color: #999;">You can change this anytime</small>
+                    </div>
+                    <div class="form-group">
+                        <label>📧 Email (Auto-filled, Non-editable)</label>
+                        <input type="email" id="profileEmail" readonly>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📱 Phone (Auto-filled, Non-editable)</label>
+                        <input type="tel" id="profilePhone" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>📝 Bio</label>
+                        <input type="text" id="profileBio" placeholder="Tell about yourself">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="updateProfile()">Save Profile</button>
+            </div>
+
+            <div class="card">
+                <h2>🪪 Free Fire UID Verification</h2>
+                <div id="uidStatusBox"></div>
+                
+                <div id="uidUploadSection" style="display: none;">
+                    <p style="color: #ddd; margin-bottom: 15px;">Upload your Free Fire UID for verification. You can only upload once!</p>
+                    
+                    <div class="form-group">
+                        <label>Your Free Fire UID (Screenshot/Image)</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="uidFile" accept="image/*" onchange="handleUidUpload(event)">
+                            <label for="uidFile" class="file-label">📸 Choose UID Screenshot</label>
+                        </div>
+                        <div id="fileInfo" class="file-info" style="display: none;"></div>
+                    </div>
+
+                    <button class="btn" id="uploadUidBtn" onclick="uploadUid()" disabled>Upload & Request Verification</button>
+                </div>
+
+                <div id="uidApprovedSection" style="display: none;">
+                    <div class="uid-status approved">
+                        ✅ Your UID has been verified by Admin! Tournament ready!
+                    </div>
+                </div>
+
+                <div id="uidPendingSection" style="display: none;">
+                    <div class="uid-status pending">
+                        ⏳ Your UID is pending admin verification. Please wait...
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📊 Performance Stats</h2>
+                <div class="profile-grid">
+                    <div class="stat-item">
+                        <strong id="statGames">0</strong>
+                        Total Tournaments
+                    </div>
+                    <div class="stat-item">
+                        <strong id="statWins">0</strong>
+                        Wins
+                    </div>
+                    <div class="stat-item">
+                        <strong id="statKills">0</strong>
+                        Total Kills
+                    </div>
+                    <div class="stat-item">
+                        <strong id="statAvgKills">0</strong>
+                        Avg Kills
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-storage-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0EOrBi_i8mBO-cmq38lL10IgTzluh5UI",
+            authDomain: "fun-with-free-fire.firebaseapp.com",
+            projectId: "fun-with-free-fire",
+            storageBucket: "fun-with-free-fire.firebasestorage.app",
+            messagingSenderId: "664963840338",
+            appId: "1:664963840338:web:7094a4747b82c31174228b"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let currentUser = null;
+        let userData = null;
+        let selectedFile = null;
+
+        // Initialize
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                loadUserData();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        async function loadUserData() {
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                userData = doc.data();
+                updateProfilePage();
+                checkUidStatus();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function updateProfilePage() {
+            // Auto-fill from signup data
+            document.getElementById('profileName').value = userData.name || '';
+            document.getElementById('profileEmail').value = userData.email || '';
+            document.getElementById('profilePhone').value = userData.phone || '';
+            document.getElementById('profileBio').value = userData.bio || '';
+
+            // Stats
+            document.getElementById('statGames').textContent = userData.totalTournaments || 0;
+            document.getElementById('statWins').textContent = userData.totalWins || 0;
+            document.getElementById('statKills').textContent = userData.totalKills || 0;
+            const avgKills = userData.totalTournaments > 0 ? (userData.totalKills / userData.totalTournaments).toFixed(1) : 0;
+            document.getElementById('statAvgKills').textContent = avgKills;
+        }
+
+        function checkUidStatus() {
+            const uidStatus = userData.uidStatus || 'not-uploaded';
+
+            document.getElementById('uidUploadSection').style.display = uidStatus === 'not-uploaded' ? 'block' : 'none';
+            document.getElementById('uidApprovedSection').style.display = uidStatus === 'approved' ? 'block' : 'none';
+            document.getElementById('uidPendingSection').style.display = uidStatus === 'pending' ? 'block' : 'none';
+
+            const statusBox = document.getElementById('uidStatusBox');
+            if (uidStatus === 'not-uploaded') {
+                statusBox.innerHTML = '<div class="uid-status not-uploaded">❌ UID Not Uploaded Yet</div>';
+            } else if (uidStatus === 'pending') {
+                statusBox.innerHTML = '<div class="uid-status pending">⏳ Pending Admin Verification</div>';
+            } else if (uidStatus === 'approved') {
+                statusBox.innerHTML = '<div class="uid-status approved">✅ UID Verified Successfully!</div>';
+            }
+        }
+
+        function handleUidUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                const fileInfo = document.getElementById('fileInfo');
+                fileInfo.textContent = `📁 Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+                fileInfo.style.display = 'block';
+                document.getElementById('uploadUidBtn').disabled = false;
+            }
+        }
+
+        async function uploadUid() {
+            if (!selectedFile) {
+                showMsg('❌ Please select a file!', 'error');
+                return;
+            }
+
+            try {
+                document.getElementById('uploadUidBtn').disabled = true;
+                const fileName = `uid_${currentUser.uid}_${Date.now()}`;
+                const storageRef = storage.ref(`uid-uploads/${fileName}`);
+                
+                await storageRef.put(selectedFile);
+                const url = await storageRef.getDownloadURL();
+
+                await db.collection('users').doc(currentUser.uid).update({
+                    uidImageUrl: url,
+                    uidStatus: 'pending',
+                    uidUploadedAt: new Date(),
+                    uidApprovedAt: null
+                });
+
+                showMsg('✅ UID uploaded! Waiting for admin verification...', 'success');
+                await loadUserData();
+            } catch (error) {
+                showMsg('❌ Error uploading UID', 'error');
+                document.getElementById('uploadUidBtn').disabled = false;
+            }
+        }
+
+        async function updateProfile() {
+            const name = document.getElementById('profileName').value;
+            const bio = document.getElementById('profileBio').value;
+
+            if (!name) {
+                showMsg('❌ Username required!', 'error');
+                return;
+            }
+
+            try {
+                await db.collection('users').doc(currentUser.uid).update({
+                    name: name,
+                    bio: bio
+                });
+                showMsg('✅ Profile updated!', 'success');
+                await loadUserData();
+            } catch (error) {
+                showMsg('❌ Error updating profile', 'error');
+            }
+        }
+
+        function showMsg(msg, type) {
+            const msgBox = document.getElementById('messageBox');
+            msgBox.textContent = msg;
+            msgBox.className = 'message ' + type;
+            setTimeout(() => { msgBox.className = 'message'; }, 4000);
+        }
+
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
+</body>
+</html>
